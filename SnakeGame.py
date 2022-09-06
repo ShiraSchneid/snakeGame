@@ -3,7 +3,6 @@
 import Draw 
 import random 
 snakeSize = 12
-score = 0 
 
 #sets up the canvas 
 Draw.setCanvasSize(500,500)
@@ -48,6 +47,12 @@ def snakeHitWall(snakeX, snakeY):
     if snakeX <= 0 or snakeX >= 475 or snakeY <= 0 or snakeY >= 475: return True
     else: return False  #if the position is somewhere off the board, you lose. 
 
+# calculates and shows increasing score
+def keepScore(score):
+    Draw.setColor(Draw.PINK)
+    Draw.setFontSize(15)
+    Draw.string("Score: "+ str(score), 400,400)
+
 #This appears when you lose the game (returns false in main) 
 def loser():
     Draw.clear()
@@ -67,7 +72,7 @@ def winner():
     Draw.string("YOU WON!", 185, 200)
     Draw.show() 
     
-def playGame(snakeSize):
+def playGame(snakeSize, score):
     color = Draw.BLUE 
     Draw.show()
     grid()   
@@ -76,7 +81,7 @@ def playGame(snakeSize):
     dy  = 0 #setting the initial movement of the snake in the y direction 
     snake = makeSnake([[10,3],[9,3],[8,3],[7,3],[6,3],[5,3],[4,3],[3,3],
                        [2,3],[1,3],[.5,3], [.25,3], [.125,3]])  #this is the full list of segments of the snake 
-    print("snake before loop:", snakeSize, snake, flush=True)
+    print("snake before loop:", snakeSize, snake, score, flush=True)
     while True: 
         if Draw.hasNextKeyTyped():   #adjusting the dx and the dy everytime a key is pressed 
             newKey = Draw.nextKeyTyped()
@@ -94,7 +99,8 @@ def playGame(snakeSize):
                 dx = 0
         snake = moveSnake(snake, dx,dy)  #updating the new snake     
         Draw.clear()
-        grid() 
+        grid()
+        keepScore(score)
         print("snake inside loop:", snakeSize, snake, score, flush=True)
         for i in range(snakeSize):  #drawing the new snake 
             Draw.setColor(color)
@@ -104,7 +110,8 @@ def playGame(snakeSize):
         Draw.show(150) #the speed of the snake 
         
         #if the snake gets the apple 
-        if eatApple(apple[0],apple[1],snake[0][0],snake[0][1]):                           
+        if eatApple(apple[0],apple[1],snake[0][0],snake[0][1]):
+            score += 50
             return True
          
         if snakeHitWall(snake[0][0],snake[0][1]) == True: #if the snake hits the wall, game over 
@@ -114,16 +121,20 @@ def playGame(snakeSize):
             return False
 def main(): 
     snakeSize = 3 #the initial amount of segments of the snake 
-    score = 0 #score starts at 0 
+    score = 0 #score starts at 0
     while True:
-        if playGame(snakeSize):
-            snakeSize +=1 
-            score +=25
-            if score== 250: # you win when you get this score 
+        if playGame(snakeSize, score):
+            snakeSize +=1
+            score += 50
+            if score== 500: # you win when you get this score
                 winner()
+                Draw.string("Score: "+ str(score), 200, 250)
+                Draw.show()
                 break
         else:
             loser()
+            Draw.string("Score: "+ str(score), 200, 250)
+            Draw.show()
             break
     
 main()
